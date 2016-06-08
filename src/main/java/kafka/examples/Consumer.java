@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
@@ -32,6 +35,7 @@ public class Consumer extends Thread
 {
   private final ConsumerConnector consumer;
   private final String topic;
+  private static final Logger logger = Logger.getLogger(Consumer.class);
   
   public Consumer(String topic)
   {
@@ -61,7 +65,20 @@ public class Consumer extends Thread
     ConsumerIterator<byte[], byte[]> it = stream.iterator();
     while(it.hasNext()){
     	MessageAndMetadata<byte[],byte[]> metadata = it.next();
-    	System.out.println(new String(metadata.message()) + " " + metadata);
+    	String message = printMessage(metadata);
+    	System.out.println(message);
+    	logger.info(message);
     }
+  }
+
+  private String printMessage(MessageAndMetadata<byte[],byte[]> metadata){
+	  StringBuffer sb = new StringBuffer();
+	  
+	  sb.append("messsge: ");
+	  sb.append(new String(metadata.message()));
+	  sb.append(" partition: ");
+	  sb.append(metadata.partition());
+
+	  return sb.toString();
   }
 }
